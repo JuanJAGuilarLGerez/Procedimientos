@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Censo UTI">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#0C3D6B">
+<title>Censo de Procedimientos UTI</title>
+<style>
+  :root {
+    --azul: #0C3D6B;
+    --azul-medio: #185FA5;
+    --azul-claro: #378ADD;
+    --azul-bg: #E6F1FB;
+    --blanco: #ffffff;
+    --gris-bg: #f0f4f8;
+    --gris-texto: #5F5E5A;
+    --gris-borde: #D3D1C7;
+    --texto: #1a1a1a;
+    --radio: 14px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', sans-serif;
+    background: var(--gris-bg);
+    min-height: 100vh;
+    min-height: 100dvh;
+    overflow-x: hidden;
+  }
+
+  /* ===== PANTALLA INICIO ===== */
+  #home-screen {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    min-height: 100dvh;
+  }
+
+  header {
+    background: var(--azul);
+    color: white;
+    padding: 20px 20px 18px;
+    padding-top: max(20px, env(safe-area-inset-top));
+    text-align: center;
+  }
+  header .subtitulo { font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; opacity: 0.65; margin-bottom: 4px; }
+  header h1 { font-size: 20px; font-weight: 700; letter-spacing: -0.3px; }
+  header .fecha { font-size: 12px; opacity: 0.6; margin-top: 4px; }
+
+  .contenido {
+    flex: 1;
+    padding: 16px 14px 24px;
+    padding-bottom: max(24px, env(safe-area-inset-bottom));
+    overflow-y: auto;
+  }
+
+  .seccion-label {
+    font-size: 10.5px;
+    font-weight: 700;
+    color: var(--gris-texto);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin: 18px 0 8px 2px;
+  }
+  .seccion-label:first-child { margin-top: 4px; }
+
+  .grilla {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  .btn-proc {
+    background: var(--blanco);
+    border: 1.5px solid #C8DCF0;
+    border-radius: var(--radio);
+    padding: 14px 10px 12px;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 7px;
+    transition: background 0.12s, border-color 0.12s, transform 0.1s;
+    text-align: center;
+    user-select: none;
+  }
+  .btn-proc:active {
+    background: var(--azul-bg);
+    border-color: var(--azul-claro);
+    transform: scale(0.96);
+  }
+  .btn-proc .icono { font-size: 26px; line-height: 1; }
+  .btn-proc .nombre {
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--azul);
+    line-height: 1.3;
+  }
+
+  /* Botón de ancho completo */
+  .btn-proc.completo {
+    grid-column: 1 / -1;
+    flex-direction: row;
+    padding: 12px 16px;
+    gap: 12px;
+    justify-content: flex-start;
+    text-align: left;
+  }
+  .btn-proc.completo .nombre { font-size: 13.5px; }
+
+  .pie {
+    text-align: center;
+    padding: 16px 0 4px;
+    font-size: 11px;
+    color: #B4B2A9;
+  }
+
+  /* ===== PANTALLA FORM ===== */
+  #form-screen {
+    display: none;
+    flex-direction: column;
+    position: fixed;
+    inset: 0;
+    background: white;
+    z-index: 100;
+  }
+
+  #form-header {
+    background: var(--azul);
+    color: white;
+    padding: 12px 14px;
+    padding-top: max(12px, env(safe-area-inset-top));
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-shrink: 0;
+  }
+
+  #btn-volver {
+    background: rgba(255,255,255,0.18);
+    border: 1px solid rgba(255,255,255,0.25);
+    color: white;
+    border-radius: 8px;
+    padding: 7px 13px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  #btn-volver:active { background: rgba(255,255,255,0.3); }
+
+  #form-titulo {
+    font-size: 14px;
+    font-weight: 600;
+    flex: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  #form-iframe {
+    flex: 1;
+    border: none;
+    width: 100%;
+    height: 100%;
+  }
+
+  /* ===== MODAL ERROR ===== */
+  #modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 200;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+  #modal-overlay.visible { display: flex; }
+  .modal-card {
+    background: white;
+    border-radius: 16px;
+    padding: 24px 20px;
+    max-width: 320px;
+    width: 100%;
+    text-align: center;
+  }
+  .modal-card .modal-icono { font-size: 36px; margin-bottom: 10px; }
+  .modal-card h3 { font-size: 16px; font-weight: 700; color: var(--azul); margin-bottom: 8px; }
+  .modal-card p { font-size: 13px; color: var(--gris-texto); line-height: 1.5; margin-bottom: 16px; }
+  .modal-card code {
+    display: block;
+    background: #f0f4f8;
+    border-radius: 8px;
+    padding: 8px 10px;
+    font-size: 11px;
+    color: #185FA5;
+    word-break: break-all;
+    margin-bottom: 16px;
+    text-align: left;
+  }
+  .modal-cerrar {
+    background: var(--azul-medio);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    padding: 10px 24px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    width: 100%;
+  }
+</style>
+</head>
+<body>
+
+<!-- ===== PANTALLA PRINCIPAL ===== -->
+<div id="home-screen">
+  <header>
+    <div class="subtitulo">Terapia Intensiva</div>
+    <h1>Censo de Procedimientos</h1>
+    <div class="fecha" id="fecha-hoy"></div>
+  </header>
+
+  <div class="contenido">
+
+    <div class="seccion-label">Vía aérea</div>
+    <div class="grilla">
+      <div class="btn-proc" onclick="abrirForm('Intubación orotraqueal', 'URL_FORM_INTUBACION')">
+        <span class="icono">🫁</span>
+        <span class="nombre">Intubación orotraqueal</span>
+      </div>
+      <div class="btn-proc" onclick="abrirForm('Traqueostomía', 'URL_FORM_TRAQUEOSTOMIA')">
+        <span class="icono">✂️</span>
+        <span class="nombre">Traqueostomía</span>
+      </div>
+      <div class="btn-proc" onclick="abrirForm('Extubación', 'URL_FORM_EXTUBACION')">
+        <span class="icono">💨</span>
+        <span class="nombre">Extubación</span>
+      </div>
+    </div>
+
+    <div class="seccion-label">Accesos vasculares</div>
+    <div class="grilla">
+      <div class="btn-proc" onclick="abrirForm('Vía central', 'URL_FORM_VIA_CENTRAL')">
+        <span class="icono">🩸</span>
+        <span class="nombre">Vía central</span>
+      </div>
+      <div class="btn-proc" onclick="abrirForm('Vía arterial', 'URL_FORM_VIA_ARTERIAL')">
+        <span class="icono">💉</span>
+        <span class="nombre">Vía arterial</span>
+      </div>
+      <div class="btn-proc" onclick="abrirForm('Acceso venoso periférico', 'URL_FORM_PERIFERICO')">
+        <span class="icono">🔵</span>
+        <span class="nombre">Acceso periférico</span>
+      </div>
+      <div class="btn-proc" onclick="abrirForm('Swan-Ganz', 'URL_FORM_SWAN')">
+        <span class="icono">📈</span>
+        <span class="nombre">Swan-Ganz</span>
+      </div>
+      <div class="btn-proc" onclick="abrirForm('PICC', 'URL_FORM_PICC')">
+        <span class="icono">🟣</span>
+        <span class="nombre">PICC</span>
+      </div>
+    </div>
+
+    <div class="seccion-label">Drenajes y punciones</div>
+    <div class="grilla">
+      <div class="btn-proc" onclick="abrirForm('Toracocentesis', 'URL_FORM_TORACOCENTESIS')">
+        <span class="icono">🫀</span>
+        <span class="nombre">Toracocentesis</span>
+      </div>
+      <div class="btn-proc" onclick="abrirForm('Paracentesis', 'URL_FORM_PARACENTESIS')">
+        <span class="icono">🫃</span>
+        <span class="nombre">Paracentesis</span>
+      </div>
+      <div class="btn-proc" onclick="abrirForm('Pericardiocentesis', 'URL_FORM_PERICARDIO')">
+        <span class="icono">❤️</span>
+        <span class="nombre">Pericardiocentesis</span>
+      </div>
+      <div class="btn-proc" onclick="abrirForm('Punción lumbar', 'URL_FORM_LUMBAR')">
+        <span class="icono">🦴</span>
+        <span class="nombre">Punción lumbar</span>
+      </div>
+      <div class="btn-proc" onclick="abrirForm('Drenaje torácico', 'URL_FORM_DRENAJE_TORACICO')">
+        <span class="icono">🔴</span>
+        <span class="nombre">Drenaje torácico</span>
+      </div>
+    </div>
+
+    <div class="seccion-label">Procedimientos cardiovasculares</div>
+    <div class="grilla">
+      <div class="btn-proc" onclick="abrirForm('Marcapasos transitorio', 'URL_FORM_MARCAPASOS')">
+        <span class="icono">⚡</span>
+        <span class="nombre">Marcapasos transitorio</span>
+      </div>
+      <div class="btn-proc" onclick="abrirForm('Cardioversión / Desfibrilación', 'URL_FORM_CARDIOVERSION')">
+        <span class="icono">🔋</span>
+        <span class="nombre">Cardioversión / Desfibrilación</span>
+      </div>
+      <div class="btn-proc completo" onclick="abrirForm('RCP / Código azul', 'URL_FORM_RCP')">
+        <span class="icono">🫶</span>
+        <span class="nombre">RCP / Código azul</span>
+      </div>
+    </div>
+
+    <div class="seccion-label">Otros procedimientos</div>
+    <div class="grilla">
+      <div class="btn-proc" onclick="abrirForm('Sonda vesical', 'URL_FORM_SONDA_VESICAL')">
+        <span class="icono">🟠</span>
+        <span class="nombre">Sonda vesical</span>
+      </div>
+      <div class="btn-proc" onclick="abrirForm('SNG / NE', 'URL_FORM_SNG')">
+        <span class="icono">🧡</span>
+        <span class="nombre">SNG / Nutrición enteral</span>
+      </div>
+      <div class="btn-proc" onclick="abrirForm('Diálisis / TCRR', 'URL_FORM_DIALISIS')">
+        <span class="icono">🔄</span>
+        <span class="nombre">Diálisis / TCRR</span>
+      </div>
+      <div class="btn-proc" onclick="abrirForm('Broncoscopía', 'URL_FORM_BRONCOSCOPIA')">
+        <span class="icono">🔬</span>
+        <span class="nombre">Broncoscopía</span>
+      </div>
+    </div>
+
+    <div class="pie">Censo UTI · v1.0</div>
+  </div>
+</div>
+
+<!-- ===== PANTALLA FORM ===== -->
+<div id="form-screen">
+  <div id="form-header">
+    <button id="btn-volver" onclick="volver()">← Volver</button>
+    <span id="form-titulo"></span>
+  </div>
+  <iframe id="form-iframe" src="" allow="camera; microphone" loading="lazy"></iframe>
+</div>
+
+<!-- ===== MODAL URL NO CONFIGURADA ===== -->
+<div id="modal-overlay">
+  <div class="modal-card">
+    <div class="modal-icono">⚙️</div>
+    <h3>URL no configurada</h3>
+    <p>Reemplazá el texto marcado en el código HTML con la URL de tu Google Form:</p>
+    <code id="modal-placeholder"></code>
+    <p>Usá la URL que termina en <strong>/viewform</strong>, no el código de insertar.</p>
+    <button class="modal-cerrar" onclick="cerrarModal()">Entendido</button>
+  </div>
+</div>
+
+<script>
+  // ===== FECHA EN HEADER =====
+  const dias = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
+  const meses = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+  const hoy = new Date();
+  document.getElementById('fecha-hoy').textContent =
+    dias[hoy.getDay()] + ' ' + hoy.getDate() + ' de ' + meses[hoy.getMonth()] + ' ' + hoy.getFullYear();
+
+  // ===== NAVEGACIÓN =====
+  function abrirForm(nombre, url) {
+    if (!url || url.startsWith('URL_FORM')) {
+      document.getElementById('modal-placeholder').textContent = url;
+      document.getElementById('modal-overlay').classList.add('visible');
+      return;
+    }
+    document.getElementById('form-titulo').textContent = nombre;
+    document.getElementById('form-iframe').src = url;
+    document.getElementById('form-screen').style.display = 'flex';
+    document.getElementById('home-screen').style.display = 'none';
+  }
+
+  function volver() {
+    document.getElementById('form-iframe').src = '';
+    document.getElementById('form-screen').style.display = 'none';
+    document.getElementById('home-screen').style.display = 'flex';
+  }
+
+  function cerrarModal() {
+    document.getElementById('modal-overlay').classList.remove('visible');
+  }
+
+  // Botón hardware de retroceso en Android
+  window.addEventListener('popstate', function() {
+    if (document.getElementById('form-screen').style.display === 'flex') {
+      volver();
+    }
+  });
+
+  history.pushState({}, '');
+</script>
+</body>
+</html>
