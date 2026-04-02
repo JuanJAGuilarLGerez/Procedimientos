@@ -94,7 +94,6 @@
     border-color: var(--azul-claro);
     transform: scale(0.96);
   }
-  .btn-proc .icono { font-size: 26px; line-height: 1; }
   .btn-proc .nombre {
     font-size: 12.5px;
     font-weight: 600;
@@ -102,22 +101,107 @@
     line-height: 1.3;
   }
 
-  /* Botón de ancho completo */
-  .btn-proc.completo {
-    grid-column: 1 / -1;
-    flex-direction: row;
-    padding: 12px 16px;
-    gap: 12px;
-    justify-content: flex-start;
-    text-align: left;
+  /* Último impar: mismo tamaño que los pares */
+  .btn-proc.ultimo-impar {
+    grid-column: 1 / 2;
   }
-  .btn-proc.completo .nombre { font-size: 13.5px; }
 
   .pie {
     text-align: center;
     padding: 16px 0 4px;
     font-size: 11px;
     color: #B4B2A9;
+  }
+
+  /* ===== BANNER INSTALACIÓN ===== */
+  #banner-instalar {
+    display: none;
+    background: #1a5c9e;
+    color: white;
+    padding: 10px 14px;
+    cursor: pointer;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+  #banner-instalar:active { background: #134a82; }
+  #banner-instalar .banner-inner {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    max-width: 480px;
+    margin: 0 auto;
+  }
+  #banner-instalar .banner-icono {
+    width: 32px;
+    height: 32px;
+    background: rgba(255,255,255,0.15);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  #banner-instalar .banner-icono svg { width: 18px; height: 18px; fill: white; }
+  #banner-instalar .banner-texto { flex: 1; }
+  #banner-instalar .banner-texto strong { font-size: 13px; font-weight: 700; display: block; }
+  #banner-instalar .banner-texto span { font-size: 11px; opacity: 0.8; }
+  #banner-instalar .banner-arrow { font-size: 16px; opacity: 0.7; }
+  #banner-instalar.visible { display: block; }
+
+  /* ===== MODAL iOS INSTRUCCIONES ===== */
+  #modal-ios {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.55);
+    z-index: 300;
+    align-items: flex-end;
+    justify-content: center;
+    padding: 0 0 20px;
+  }
+  #modal-ios.visible { display: flex; }
+  .ios-card {
+    background: white;
+    border-radius: 18px 18px 14px 14px;
+    padding: 20px 20px 24px;
+    width: 100%;
+    max-width: 400px;
+    margin: 0 12px;
+  }
+  .ios-card h3 { font-size: 15px; font-weight: 700; color: var(--azul); margin-bottom: 14px; text-align: center; }
+  .ios-paso {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    margin-bottom: 14px;
+  }
+  .ios-paso .num {
+    background: var(--azul);
+    color: white;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    font-size: 12px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+  .ios-paso p { font-size: 13px; color: #333; line-height: 1.5; margin: 0; }
+  .ios-paso p b { color: var(--azul); }
+  .ios-cerrar {
+    width: 100%;
+    background: var(--azul-medio);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    padding: 11px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 6px;
   }
 
   /* ===== PANTALLA FORM ===== */
@@ -227,105 +311,89 @@
     <div class="fecha" id="fecha-hoy"></div>
   </header>
 
-  <div class="contenido">
-
-    <div class="seccion-label">Vía aérea</div>
-    <div class="grilla">
-      <div class="btn-proc" onclick="abrirForm('Intubación orotraqueal', 'https://docs.google.com/forms/d/e/1FAIpQLSfikc1aFcWOxd7RIayir8jg-i88gIU5mK0WKiU2oDqcj_K90A/viewform')">
-        <span class="icono">🫁</span>
-        <span class="nombre">Intubación orotraqueal</span>
+  <div id="banner-instalar" onclick="accionInstalar()">
+    <div class="banner-inner">
+      <div class="banner-icono">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M19 9h-4V3H9v6H5l7 7 7-7zm-14 9v2h14v-2H5z"/></svg>
       </div>
-      <div class="btn-proc" onclick="abrirForm('Traqueostomía', 'URL_FORM_TRAQUEOSTOMIA')">
-        <span class="icono">✂️</span>
-        <span class="nombre">Traqueostomía</span>
+      <div class="banner-texto">
+        <strong>Instalar app en pantalla de inicio</strong>
+        <span>Acceso rapido sin abrir el navegador</span>
       </div>
-      <div class="btn-proc" onclick="abrirForm('Extubación', 'URL_FORM_EXTUBACION')">
-        <span class="icono">💨</span>
-        <span class="nombre">Extubación</span>
-      </div>
+      <div class="banner-arrow">›</div>
     </div>
+  </div>
+
+  <div class="contenido">
 
     <div class="seccion-label">Accesos vasculares</div>
     <div class="grilla">
-      <div class="btn-proc" onclick="abrirForm('Vía central', 'URL_FORM_VIA_CENTRAL')">
-        <span class="icono">🩸</span>
-        <span class="nombre">Vía central</span>
+      <div class="btn-proc" onclick="abrirForm('Catéter venoso central', 'URL_FORM_CVC')">
+        <span class="nombre">Catéter venoso central</span>
       </div>
-      <div class="btn-proc" onclick="abrirForm('Vía arterial', 'URL_FORM_VIA_ARTERIAL')">
-        <span class="icono">💉</span>
-        <span class="nombre">Vía arterial</span>
+      <div class="btn-proc" onclick="abrirForm('Línea arterial', 'URL_FORM_LINEA_ARTERIAL')">
+        <span class="nombre">Línea arterial</span>
       </div>
-      <div class="btn-proc" onclick="abrirForm('Acceso venoso periférico', 'URL_FORM_PERIFERICO')">
-        <span class="icono">🔵</span>
-        <span class="nombre">Acceso periférico</span>
+      <div class="btn-proc" onclick="abrirForm('Catéter de hemodiálisis', 'URL_FORM_HEMODIALISIS')">
+        <span class="nombre">Catéter de hemodiálisis</span>
       </div>
-      <div class="btn-proc" onclick="abrirForm('Swan-Ganz', 'URL_FORM_SWAN')">
-        <span class="icono">📈</span>
-        <span class="nombre">Swan-Ganz</span>
+      <div class="btn-proc" onclick="abrirForm('Catéter de alto flujo', 'URL_FORM_ALTO_FLUJO')">
+        <span class="nombre">Catéter de alto flujo</span>
       </div>
-      <div class="btn-proc" onclick="abrirForm('PICC', 'URL_FORM_PICC')">
-        <span class="icono">🟣</span>
-        <span class="nombre">PICC</span>
+      <div class="btn-proc" onclick="abrirForm('Catéter de la arteria pulmonar', 'URL_FORM_ART_PULMONAR')">
+        <span class="nombre">Catéter art. pulmonar</span>
       </div>
-    </div>
-
-    <div class="seccion-label">Drenajes y punciones</div>
-    <div class="grilla">
-      <div class="btn-proc" onclick="abrirForm('Toracocentesis', 'URL_FORM_TORACOCENTESIS')">
-        <span class="icono">🫀</span>
-        <span class="nombre">Toracocentesis</span>
+      <div class="btn-proc" onclick="abrirForm('Catéter intraóseo', 'URL_FORM_INTRAOSEO')">
+        <span class="nombre">Catéter intraóseo</span>
       </div>
-      <div class="btn-proc" onclick="abrirForm('Paracentesis', 'URL_FORM_PARACENTESIS')">
-        <span class="icono">🫃</span>
-        <span class="nombre">Paracentesis</span>
+      <div class="btn-proc" onclick="abrirForm('Marcapasos transvenoso', 'URL_FORM_MARCAPASOS')">
+        <span class="nombre">Marcapasos transvenoso</span>
       </div>
-      <div class="btn-proc" onclick="abrirForm('Pericardiocentesis', 'URL_FORM_PERICARDIO')">
-        <span class="icono">❤️</span>
-        <span class="nombre">Pericardiocentesis</span>
+      <div class="btn-proc" onclick="abrirForm('Introductor aislado', 'URL_FORM_INTRODUCTOR')">
+        <span class="nombre">Introductor aislado</span>
       </div>
-      <div class="btn-proc" onclick="abrirForm('Punción lumbar', 'URL_FORM_LUMBAR')">
-        <span class="icono">🦴</span>
-        <span class="nombre">Punción lumbar</span>
-      </div>
-      <div class="btn-proc" onclick="abrirForm('Drenaje torácico', 'URL_FORM_DRENAJE_TORACICO')">
-        <span class="icono">🔴</span>
-        <span class="nombre">Drenaje torácico</span>
+      <div class="btn-proc ultimo-impar" onclick="abrirForm('Catéter PICC', 'URL_FORM_PICC')">
+        <span class="nombre">Catéter PICC</span>
       </div>
     </div>
 
-    <div class="seccion-label">Procedimientos cardiovasculares</div>
+    <div class="seccion-label">Vía aérea</div>
     <div class="grilla">
-      <div class="btn-proc" onclick="abrirForm('Marcapasos transitorio', 'URL_FORM_MARCAPASOS')">
-        <span class="icono">⚡</span>
-        <span class="nombre">Marcapasos transitorio</span>
-      </div>
-      <div class="btn-proc" onclick="abrirForm('Cardioversión / Desfibrilación', 'URL_FORM_CARDIOVERSION')">
-        <span class="icono">🔋</span>
-        <span class="nombre">Cardioversión / Desfibrilación</span>
-      </div>
-      <div class="btn-proc completo" onclick="abrirForm('RCP / Código azul', 'URL_FORM_RCP')">
-        <span class="icono">🫶</span>
-        <span class="nombre">RCP / Código azul</span>
-      </div>
-    </div>
-
-    <div class="seccion-label">Otros procedimientos</div>
-    <div class="grilla">
-      <div class="btn-proc" onclick="abrirForm('Sonda vesical', 'URL_FORM_SONDA_VESICAL')">
-        <span class="icono">🟠</span>
-        <span class="nombre">Sonda vesical</span>
-      </div>
-      <div class="btn-proc" onclick="abrirForm('SNG / NE', 'URL_FORM_SNG')">
-        <span class="icono">🧡</span>
-        <span class="nombre">SNG / Nutrición enteral</span>
-      </div>
-      <div class="btn-proc" onclick="abrirForm('Diálisis / TCRR', 'URL_FORM_DIALISIS')">
-        <span class="icono">🔄</span>
-        <span class="nombre">Diálisis / TCRR</span>
+      <div class="btn-proc" onclick="abrirForm('Intubación orotraqueal', 'URL_FORM_INTUBACION')">
+        <span class="nombre">Intubación orotraqueal</span>
       </div>
       <div class="btn-proc" onclick="abrirForm('Broncoscopía', 'URL_FORM_BRONCOSCOPIA')">
-        <span class="icono">🔬</span>
         <span class="nombre">Broncoscopía</span>
+      </div>
+      <div class="btn-proc ultimo-impar" onclick="abrirForm('Traqueostomía percutánea', 'URL_FORM_TRAQUEOSTOMIA')">
+        <span class="nombre">Traqueostomía percutánea</span>
+      </div>
+    </div>
+
+    <div class="seccion-label">Tórax</div>
+    <div class="grilla">
+      <div class="btn-proc" onclick="abrirForm('Toracocentesis', 'URL_FORM_TORACOCENTESIS')">
+        <span class="nombre">Toracocentesis</span>
+      </div>
+      <div class="btn-proc" onclick="abrirForm('Pericardiocentesis', 'URL_FORM_PERICARDIO')">
+        <span class="nombre">Pericardiocentesis</span>
+      </div>
+    </div>
+
+    <div class="seccion-label">Abdomen</div>
+    <div class="grilla">
+      <div class="btn-proc" onclick="abrirForm('Sonda oro/nasogástrica', 'URL_FORM_SNG')">
+        <span class="nombre">Sonda oro/nasogástrica</span>
+      </div>
+      <div class="btn-proc" onclick="abrirForm('Paracentesis', 'URL_FORM_PARACENTESIS')">
+        <span class="nombre">Paracentesis</span>
+      </div>
+    </div>
+
+    <div class="seccion-label">SNC</div>
+    <div class="grilla">
+      <div class="btn-proc ultimo-impar" onclick="abrirForm('Punción lumbar', 'URL_FORM_LUMBAR')">
+        <span class="nombre">Punción lumbar</span>
       </div>
     </div>
 
@@ -345,7 +413,7 @@
 <!-- ===== MODAL URL NO CONFIGURADA ===== -->
 <div id="modal-overlay">
   <div class="modal-card">
-    <div class="modal-icono">⚙️</div>
+    <div class="modal-icono" style="font-size:28px;margin-bottom:10px;">[ ? ]</div>
     <h3>URL no configurada</h3>
     <p>Reemplazá el texto marcado en el código HTML con la URL de tu Google Form:</p>
     <code id="modal-placeholder"></code>
@@ -354,7 +422,63 @@
   </div>
 </div>
 
+<!-- ===== MODAL iOS INSTRUCCIONES ===== -->
+<div id="modal-ios">
+  <div class="ios-card">
+    <h3>Instalar en pantalla de inicio</h3>
+    <div class="ios-paso">
+      <div class="num">1</div>
+      <p>Toca el boton de <b>compartir</b> en la barra inferior de Safari (cuadrado con flecha hacia arriba)</p>
+    </div>
+    <div class="ios-paso">
+      <div class="num">2</div>
+      <p>Desplazate hacia abajo en el menu y toca <b>"Agregar a pantalla de inicio"</b></p>
+    </div>
+    <div class="ios-paso">
+      <div class="num">3</div>
+      <p>Toca <b>"Agregar"</b> en la esquina superior derecha</p>
+    </div>
+    <button class="ios-cerrar" onclick="cerrarModalIos()">Entendido</button>
+  </div>
+</div>
+
 <script>
+  // ===== DETECCIÓN DE INSTALACIÓN =====
+  var deferredPrompt = null;
+  var esIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+  var esSafariIOS = esIOS && !window.navigator.standalone && /safari/i.test(navigator.userAgent);
+  var esAndroid = /android/i.test(navigator.userAgent);
+  var yaInstalada = window.navigator.standalone === true ||
+    window.matchMedia('(display-mode: standalone)').matches ||
+    window.matchMedia('(display-mode: fullscreen)').matches;
+
+  if (!yaInstalada) {
+    if (esSafariIOS) {
+      document.getElementById('banner-instalar').classList.add('visible');
+    }
+    window.addEventListener('beforeinstallprompt', function(e) {
+      e.preventDefault();
+      deferredPrompt = e;
+      document.getElementById('banner-instalar').classList.add('visible');
+    });
+  }
+
+  function accionInstalar() {
+    if (deferredPrompt) {
+      deferredPrompt.prompt();
+      deferredPrompt.userChoice.then(function() {
+        deferredPrompt = null;
+        document.getElementById('banner-instalar').classList.remove('visible');
+      });
+    } else if (esSafariIOS) {
+      document.getElementById('modal-ios').classList.add('visible');
+    }
+  }
+
+  function cerrarModalIos() {
+    document.getElementById('modal-ios').classList.remove('visible');
+  }
+
   // ===== FECHA EN HEADER =====
   const dias = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
   const meses = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
