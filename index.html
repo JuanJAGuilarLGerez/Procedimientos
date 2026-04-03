@@ -255,13 +255,27 @@
   }
   #btn-volver:active { background: rgba(255,255,255,0.3); }
 
+  #form-titulo-wrap {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
   #form-titulo {
     font-size: 14px;
     font-weight: 600;
-    flex: 1;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+  }
+
+  #form-datetime {
+    font-size: 11px;
+    opacity: 0.75;
+    letter-spacing: 0.2px;
+    white-space: nowrap;
   }
 
   #form-iframe {
@@ -426,7 +440,10 @@
 <div id="form-screen">
   <div id="form-header">
     <button id="btn-volver" onclick="volver()">← Volver</button>
-    <span id="form-titulo"></span>
+    <div id="form-titulo-wrap">
+      <span id="form-titulo"></span>
+      <span id="form-datetime"></span>
+    </div>
   </div>
   <iframe id="form-iframe" src="" allow="camera; microphone" loading="lazy"></iframe>
 </div>
@@ -507,6 +524,22 @@
   document.getElementById('fecha-hoy').textContent =
     dias[hoy.getDay()] + ' ' + hoy.getDate() + ' de ' + meses[hoy.getMonth()] + ' ' + hoy.getFullYear();
 
+  // ===== RELOJ EN FORM HEADER =====
+  var relojInterval = null;
+
+  function actualizarReloj() {
+    var ahora = new Date();
+    var diaSem = dias[ahora.getDay()];
+    var dia = ahora.getDate();
+    var mes = meses[ahora.getMonth()];
+    var anio = ahora.getFullYear();
+    var hh = String(ahora.getHours()).padStart(2, '0');
+    var mm = String(ahora.getMinutes()).padStart(2, '0');
+    var ss = String(ahora.getSeconds()).padStart(2, '0');
+    document.getElementById('form-datetime').textContent =
+      diaSem + ' ' + dia + ' de ' + mes + ' ' + anio + ' · ' + hh + ':' + mm + ':' + ss;
+  }
+
   // ===== NAVEGACIÓN =====
   function abrirForm(nombre, url) {
     if (!url || url.startsWith('URL_FORM')) {
@@ -515,12 +548,16 @@
       return;
     }
     document.getElementById('form-titulo').textContent = nombre;
+    actualizarReloj();
+    if (relojInterval) clearInterval(relojInterval);
+    relojInterval = setInterval(actualizarReloj, 1000);
     document.getElementById('form-iframe').src = url;
     document.getElementById('form-screen').style.display = 'flex';
     document.getElementById('home-screen').style.display = 'none';
   }
 
   function volver() {
+    if (relojInterval) { clearInterval(relojInterval); relojInterval = null; }
     document.getElementById('form-iframe').src = '';
     document.getElementById('form-screen').style.display = 'none';
     document.getElementById('home-screen').style.display = 'flex';
